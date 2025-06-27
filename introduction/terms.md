@@ -100,9 +100,3 @@ The glossary of terms and expressions on Developer Center is provided in the tab
         </tr>
     </tbody>
 </table>
-
-
-
-
-
-
