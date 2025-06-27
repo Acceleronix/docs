@@ -2,10 +2,10 @@
 
 The glossary of terms and expressions on Developer Center is provided in the table below.
 
-<table class="relative-table wrapped confluenceTable tablesorter tablesorter-default stickyTableHeaders" style="width: 100%; padding: 0px;" role="grid" resolved="">
+<table class="relative-table wrapped confluenceTable tablesorter tablesorter-default stickyTableHeaders" style="width: 100%; padding: 0px;" role="grid">
     <colgroup>
-        <col style="width: 9.72322%;">
-        <col style="width: 90.216%;">
+        <col style="width: 9.72322%;" />
+        <col style="width: 90.216%;" />
     </colgroup>
     <thead class="tableFloatingHeaderOriginal">
         <tr role="row" class="tablesorter-headerRow">
