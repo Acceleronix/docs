@@ -76,7 +76,43 @@ Use this tool to automatically generate the required `username` and `password` p
 </div>
 
 <button 
-  onClick={() => window.generateAuthParams && window.generateAuthParams()}
+  onClick={async () => {
+    try {
+      const accessKey = document.getElementById('accessKey').value.trim();
+      const accessSecret = document.getElementById('accessSecret').value.trim();
+      
+      if (!accessKey || !accessSecret) {
+        alert('Please enter both AccessKey and AccessSecret');
+        return;
+      }
+      
+      // Generate timestamp
+      const timestamp = Date.now().toString();
+      
+      // Create username string
+      const usernameRaw = `ver=1&auth_mode=accessKey&sign_method=sha256&access_key=${accessKey}&timestamp=${timestamp}`;
+      
+      // URL encode username
+      const usernameEncoded = encodeURIComponent(usernameRaw);
+      
+      // Generate SHA256 password
+      const passwordInput = usernameRaw + accessSecret;
+      const msgUint8 = new TextEncoder().encode(passwordInput);
+      const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      const passwordHash = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+      
+      // Display results
+      document.getElementById('usernameResult').textContent = usernameEncoded;
+      document.getElementById('passwordResult').textContent = passwordHash;
+      document.getElementById('authResult').style.display = 'block';
+      
+      console.log('Parameters generated successfully');
+    } catch (error) {
+      console.error('Error generating parameters:', error);
+      alert('Error generating parameters: ' + error.message);
+    }
+  }}
   style={{
     backgroundColor: '#16A34A',
     color: 'white',
@@ -108,7 +144,27 @@ Use this tool to automatically generate the required `username` and `password` p
     }}>
       <span id="usernameResult"></span>
     </div>
-    <button onClick={() => window.copyToClipboard && window.copyToClipboard('usernameResult')} style={{
+    <button onClick={(e) => {
+      try {
+        const text = document.getElementById('usernameResult').textContent;
+        navigator.clipboard.writeText(text).then(() => {
+          const button = e.target;
+          const originalText = button.textContent;
+          button.textContent = 'Copied!';
+          button.style.backgroundColor = '#16A34A';
+          button.style.color = 'white';
+          setTimeout(() => {
+            button.textContent = originalText;
+            button.style.backgroundColor = '#f0f0f0';
+            button.style.color = 'black';
+          }, 1000);
+        }).catch(() => {
+          alert('Copy failed. Please select and copy manually.');
+        });
+      } catch (error) {
+        alert('Copy failed. Please select and copy manually.');
+      }
+    }} style={{
       fontSize: '12px',
       padding: '4px 8px',
       backgroundColor: '#f0f0f0',
@@ -132,7 +188,27 @@ Use this tool to automatically generate the required `username` and `password` p
     }}>
       <span id="passwordResult"></span>
     </div>
-    <button onClick={() => window.copyToClipboard && window.copyToClipboard('passwordResult')} style={{
+    <button onClick={(e) => {
+      try {
+        const text = document.getElementById('passwordResult').textContent;
+        navigator.clipboard.writeText(text).then(() => {
+          const button = e.target;
+          const originalText = button.textContent;
+          button.textContent = 'Copied!';
+          button.style.backgroundColor = '#16A34A';
+          button.style.color = 'white';
+          setTimeout(() => {
+            button.textContent = originalText;
+            button.style.backgroundColor = '#f0f0f0';
+            button.style.color = 'black';
+          }, 1000);
+        }).catch(() => {
+          alert('Copy failed. Please select and copy manually.');
+        });
+      } catch (error) {
+        alert('Copy failed. Please select and copy manually.');
+      }
+    }} style={{
       fontSize: '12px',
       padding: '4px 8px',
       backgroundColor: '#f0f0f0',
@@ -163,88 +239,6 @@ Use this tool to automatically generate the required `username` and `password` p
 
 </div>
 
-<script dangerouslySetInnerHTML={{
-  __html: `
-    // Bind functions to global window object to ensure they're accessible
-    window.sha256 = async function(message) {
-      const msgUint8 = new TextEncoder().encode(message);
-      const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
-      const hashArray = Array.from(new Uint8Array(hashBuffer));
-      const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-      return hashHex;
-    };
-
-    window.generateAuthParams = async function() {
-      try {
-        const accessKey = document.getElementById('accessKey').value.trim();
-        const accessSecret = document.getElementById('accessSecret').value.trim();
-        
-        if (!accessKey || !accessSecret) {
-          alert('Please enter both AccessKey and AccessSecret');
-          return;
-        }
-        
-        // Generate timestamp (current time in milliseconds)
-        const timestamp = Date.now().toString();
-        
-        // Create username string
-        const usernameRaw = \`ver=1&auth_mode=accessKey&sign_method=sha256&access_key=\${accessKey}&timestamp=\${timestamp}\`;
-        
-        // URL encode username
-        const usernameEncoded = encodeURIComponent(usernameRaw);
-        
-        // Generate SHA256 password
-        const passwordInput = usernameRaw + accessSecret;
-        const passwordHash = await window.sha256(passwordInput);
-        
-        // Display results
-        document.getElementById('usernameResult').textContent = usernameEncoded;
-        document.getElementById('passwordResult').textContent = passwordHash;
-        document.getElementById('authResult').style.display = 'block';
-        
-        console.log('Parameters generated successfully');
-      } catch (error) {
-        console.error('Error generating parameters:', error);
-        alert('Error generating parameters: ' + error.message);
-      }
-    };
-
-    window.copyToClipboard = function(elementId) {
-      try {
-        const text = document.getElementById(elementId).textContent;
-        navigator.clipboard.writeText(text).then(function() {
-          // Visual feedback
-          const button = event.target;
-          const originalText = button.textContent;
-          button.textContent = 'Copied!';
-          button.style.backgroundColor = '#16A34A';
-          button.style.color = 'white';
-          setTimeout(() => {
-            button.textContent = originalText;
-            button.style.backgroundColor = '#f0f0f0';
-            button.style.color = 'black';
-          }, 1000);
-        }).catch(function(err) {
-          console.error('Could not copy text: ', err);
-          // Fallback for older browsers
-          const textArea = document.createElement('textarea');
-          textArea.value = text;
-          document.body.appendChild(textArea);
-          textArea.select();
-          document.execCommand('copy');
-          document.body.removeChild(textArea);
-          alert('Copied to clipboard!');
-        });
-      } catch (error) {
-        console.error('Copy failed: ', error);
-        alert('Copy failed. Please select and copy manually.');
-      }
-    };
-
-    // Ensure functions are loaded
-    console.log('Authentication helper functions loaded');
-  `
-}} />
 
 ## Step-by-Step Guide
 
