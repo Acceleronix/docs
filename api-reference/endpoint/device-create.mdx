@@ -1,0 +1,111 @@
+---
+title: 'Create Device'
+openapi: 'POST /v2/devicemgr/r3/openapi/device/create'
+---
+
+Add a new device to an existing product. This endpoint allows you to register a single device with various authentication modes and configuration options.
+
+## Authentication Required
+
+This endpoint requires a valid QJWT access token. Include your token in the Authorization header:
+
+```
+Authorization: QJWT your_access_token_here
+```
+
+To obtain an access token, use the [Get Access Token](/api-reference/endpoint/webhook) endpoint.
+
+## Request Body
+
+The request body should be JSON with the following fields:
+
+### Required Fields
+- **deviceKey**: Unique device identifier
+- **productKey**: Product key that this device belongs to
+
+### Optional Fields
+- **deviceName**: Human-readable device name
+- **authMode**: Authentication method (default: 0)
+  - 0: Dynamic authentication
+  - 1: Static authentication  
+  - 2: X.509 certificate authentication
+- **sn**: Device serial number
+- **fingerPrint**: Device fingerprint (required for X.509 device addition)
+- **psk**: Pre-shared key (required for China Telecom AEP device addition)
+
+## Authentication Modes
+
+### Dynamic Authentication (authMode: 0)
+- Default mode for most IoT devices
+- Device credentials are automatically generated
+- No additional parameters required
+
+### Static Authentication (authMode: 1)
+- Device uses predefined credentials
+- Suitable for devices with fixed authentication
+
+### X.509 Certificate Authentication (authMode: 2)
+- Certificate-based authentication
+- Requires **fingerPrint** parameter
+- Higher security for enterprise deployments
+
+## Response
+
+Successful response includes:
+- **code**: 200 for success
+- **msg**: Response message (usually empty for success)
+- **data**: Additional response data (optional)
+
+## Error Handling
+
+Common error responses:
+- **400**: Bad request - Invalid parameters
+- **401**: Unauthorized - Invalid or expired token
+- **403**: Forbidden - Insufficient permissions
+- **50000**: Service exception
+- **91001**: Token does not exist
+- **91004**: Token incorrect
+
+## Usage Example
+
+```bash
+curl -X POST "https://iot-api.acceleronix.io/v2/devicemgr/r3/openapi/device/create" \
+  -H "Authorization: QJWT your_access_token_here" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "deviceKey": "DK00001",
+    "deviceName": "Smart Sensor 01", 
+    "productKey": "PK0001",
+    "authMode": 0,
+    "sn": "SN00001"
+  }'
+```
+
+### Request Example (X.509 Authentication)
+
+```json
+{
+  "deviceKey": "DK00002",
+  "deviceName": "Secure Gateway",
+  "productKey": "PK0001", 
+  "authMode": 2,
+  "fingerPrint": "d30075fefc2c86d1f9ae5a2960750485076d7213",
+  "sn": "SN00002"
+}
+```
+
+### Response Example
+
+```json
+{
+  "code": 200,
+  "msg": "Device created successfully"
+}
+```
+
+## Important Notes
+
+- **deviceKey** must be unique within the product
+- Make sure the **productKey** exists before creating devices
+- For X.509 authentication, generate the device certificate and provide the correct **fingerPrint**
+- Keep device credentials secure and do not expose them in logs or client-side code

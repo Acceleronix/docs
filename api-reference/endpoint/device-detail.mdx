@@ -1,0 +1,109 @@
+---
+title: 'Get Device Detail'
+openapi: 'GET /v2/devicemgr/r3/openapi/device/detail'
+---
+
+Query detailed information of a specific device. This endpoint returns comprehensive device status, configuration, and operational data.
+
+## Authentication Required
+
+This endpoint requires a valid QJWT access token. Include your token in the Authorization header:
+
+```
+Authorization: QJWT your_access_token_here
+```
+
+To obtain an access token, use the [Get Access Token](/api-reference/endpoint/webhook) endpoint.
+
+## Request Parameters
+
+Both parameters are required to identify the device:
+
+- **deviceKey** (required): Unique device identifier
+- **productKey** (required): Product key that the device belongs to
+
+## Response
+
+The response includes comprehensive device information:
+
+### Device Status Fields
+- **deviceStatus**: Device connection status (1=Online, 0=Offline)
+- **isActived**: Activation status (1=Activated, 0=Not activated)
+- **isVerified**: Secondary authentication status (0=Not authenticated, 1=Authenticated)
+- **isVirtual**: Virtual device flag (0=Real device, 1=Virtual device)
+
+### Device Configuration
+- **authMode**: Authentication method
+  - 0: Dynamic authentication
+  - 1: Static authentication  
+  - 2: X.509 certificate authentication
+- **dataFmt**: Data format (0=Transparent transmission, 3=Thing model)
+
+### Device Identity
+- **deviceKey**: Device unique identifier
+- **deviceName**: Human-readable device name
+- **productKey**: Product identifier
+- **sn**: Device serial number
+
+### Timestamps
+- **createTime**: Device creation timestamp (milliseconds)
+- **activedTime**: Device activation timestamp (milliseconds)
+- **firstConnTime**: First connection timestamp (milliseconds)
+- **lastConnTime**: Last online timestamp (milliseconds)
+- **lastOfflineTime**: Last offline timestamp (milliseconds)
+- **updateTime**: Last update timestamp (milliseconds)
+
+## Error Handling
+
+Common error responses:
+- **400**: Bad request - Invalid parameters
+- **401**: Unauthorized - Invalid or expired token
+- **403**: Forbidden - Insufficient permissions
+- **404**: Device not found
+- **50000**: Service exception
+- **50005**: Parameter check error
+- **70130**: Non-existent device
+- **91001**: Token does not exist
+- **91004**: Token incorrect
+- **91005**: Insufficient permissions
+
+## Usage Example
+
+```bash
+curl -X GET "https://iot-api.acceleronix.io/v2/devicemgr/r3/openapi/device/detail?deviceKey=DK00001&productKey=PK0001" \
+  -H "Authorization: QJWT your_access_token_here"
+```
+
+### Response Example
+
+```json
+{
+  "code": 200,
+  "data": {
+    "deviceKey": "DK00001",
+    "deviceName": "Smart Temperature Sensor 01",
+    "productKey": "PK0001",
+    "deviceStatus": 1,
+    "isActived": 1,
+    "isVerified": 1,
+    "isVirtual": 0,
+    "authMode": 0,
+    "dataFmt": 3,
+    "sn": "SN00001",
+    "createTime": 1744179122906,
+    "activedTime": 1748944587349,
+    "firstConnTime": 1744179201775,
+    "lastConnTime": 1748922175239,
+    "lastOfflineTime": 1747316156218,
+    "updateTime": 1748944587349
+  },
+  "msg": ""
+}
+```
+
+## Use Cases
+
+- **Device monitoring**: Check real-time device status and connectivity
+- **Device management**: Retrieve configuration and authentication details
+- **Troubleshooting**: Access connection history and timestamps
+- **System integration**: Get device metadata for external systems

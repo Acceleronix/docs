@@ -42,13 +42,17 @@
           {
             "group": "Product Management",
             "pages": [
-              "api-reference/endpoint/get"
+              "api-reference/endpoint/get",
+              "api-reference/endpoint/product-list"
             ]
           },
           {
             "group": "Device Management",
             "pages": [
-              "api-reference/endpoint/create"
+              "api-reference/endpoint/create",
+              "api-reference/endpoint/device-create",
+              "api-reference/endpoint/device-detail",
+              "api-reference/endpoint/device-data-history"
             ]
           }
         ]

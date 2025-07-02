@@ -289,6 +289,640 @@
         },
         "security": []
       }
+    },
+    "/v2/quecproductmgr/r3/openapi/products": {
+      "get": {
+        "summary": "Get Product List",
+        "description": "Query product list with pagination support",
+        "operationId": "getProductList",
+        "tags": ["Product Management"],
+        "parameters": [
+          {
+            "name": "pageNum",
+            "in": "query",
+            "description": "Page number (default: 1)",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 1
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "description": "Page size (default: 10)",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 10
+            }
+          },
+          {
+            "name": "productKey",
+            "in": "query",
+            "description": "Product Key filter",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Product list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductListResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v2/devicemgr/r3/openapi/device/create": {
+      "post": {
+        "summary": "Create Device",
+        "description": "Add a new device to a product",
+        "operationId": "createDevice",
+        "tags": ["Device Management"],
+        "requestBody": {
+          "description": "Device creation parameters",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeviceCreateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Device created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v2/devicemgr/r3/openapi/device/detail": {
+      "get": {
+        "summary": "Get Device Detail",
+        "description": "Query detailed information of a specific device",
+        "operationId": "getDeviceDetail",
+        "tags": ["Device Management"],
+        "parameters": [
+          {
+            "name": "deviceKey",
+            "in": "query",
+            "description": "Device Key",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "productKey",
+            "in": "query",
+            "description": "Product Key",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Device detail information",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeviceDetailResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Device not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v2/quecdatastorage/r1/openapi/device/data/history": {
+      "get": {
+        "summary": "Get Device Data History",
+        "description": "Query device historical uplink/downlink data logs",
+        "operationId": "getDeviceDataHistory",
+        "tags": ["Device Management"],
+        "parameters": [
+          {
+            "name": "deviceKey",
+            "in": "query",
+            "description": "Device Key (required with productKey)",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "productKey",
+            "in": "query",
+            "description": "Product Key (required with deviceKey)",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "deviceId",
+            "in": "query",
+            "description": "Device ID (alternative to productKey/deviceKey)",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "beginDateTimp",
+            "in": "query",
+            "description": "Start time timestamp in milliseconds",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "endDateTimp",
+            "in": "query",
+            "description": "End time timestamp in milliseconds",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "direction",
+            "in": "query",
+            "description": "Data direction: 1-Uplink, 2-Downlink",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "enum": [1, 2]
+            }
+          },
+          {
+            "name": "sendStatus",
+            "in": "query",
+            "description": "Send status: 0-Not sent, 1-Sent, -1-Send failed",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "enum": [-1, 0, 1]
+            }
+          },
+          {
+            "name": "pageNum",
+            "in": "query",
+            "description": "Page number (default: 1)",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 1
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "description": "Page size (default: 10)",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 10
+            }
+          },
+          {
+            "name": "language",
+            "in": "query",
+            "description": "Language: CN/EN (default: CN)",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["CN", "EN"],
+              "default": "CN"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Device data history",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeviceDataHistoryResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v2/deviceshadow/r1/openapi/device/getlocation": {
+      "get": {
+        "summary": "Get Device Location",
+        "description": "Query the latest GPS/location data for a specific device",
+        "operationId": "getDeviceLocation",
+        "tags": ["Device Management"],
+        "parameters": [
+          {
+            "name": "deviceId",
+            "in": "query",
+            "description": "Device ID (alternative to productKey/deviceKey)",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "deviceKey",
+            "in": "query",
+            "description": "Device Key (required with productKey)",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "productKey",
+            "in": "query",
+            "description": "Product Key (required with deviceKey)",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "language",
+            "in": "query",
+            "description": "Language: CN/EN (default: CN)",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["CN", "EN"],
+              "default": "CN"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Device location data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeviceLocationResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v2/deviceshadow/r2/openapi/device/resource": {
+      "get": {
+        "summary": "Get Device Resource",
+        "description": "Query comprehensive device resource information including battery, signal strength, and network details",
+        "operationId": "getDeviceResource",
+        "tags": ["Device Management"],
+        "parameters": [
+          {
+            "name": "deviceKey",
+            "in": "query",
+            "description": "Device Key",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "productKey",
+            "in": "query",
+            "description": "Product Key",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "language",
+            "in": "query",
+            "description": "Language: CN/EN (default: CN)",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["CN", "EN"],
+              "default": "CN"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Device resource information",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeviceResourceResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v2/deviceshadow/r3/openapi/dm/readData": {
+      "post": {
+        "summary": "Read Device Data",
+        "description": "Read thing model property data from devices",
+        "operationId": "readDeviceData",
+        "tags": ["Device Management"],
+        "parameters": [
+          {
+            "name": "language",
+            "in": "query",
+            "description": "Language: CN/EN (default: CN)",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["CN", "EN"],
+              "default": "CN"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Device data read request",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeviceReadDataRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Device data read response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeviceDataOperationResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v2/deviceshadow/r3/openapi/dm/writeData": {
+      "post": {
+        "summary": "Write Device Data",
+        "description": "Send structured thing model property data to devices",
+        "operationId": "writeDeviceData",
+        "tags": ["Device Management"],
+        "parameters": [
+          {
+            "name": "language",
+            "in": "query",
+            "description": "Language: CN/EN (default: CN)",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["CN", "EN"],
+              "default": "CN"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Device data write request",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeviceWriteDataRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Device data write response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeviceDataOperationResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v2/deviceshadow/r3/openapi/raw/sendData": {
+      "post": {
+        "summary": "Send Raw Data to Device",
+        "description": "Send raw/transparent transmission data directly to devices",
+        "operationId": "sendRawData",
+        "tags": ["Device Management"],
+        "parameters": [
+          {
+            "name": "language",
+            "in": "query",
+            "description": "Language: CN/EN (default: CN)",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["CN", "EN"],
+              "default": "CN"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Raw data send request",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeviceSendRawDataRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Raw data send response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeviceDataOperationResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v2/quecproductmgr/r3/openapi/product/detail": {
+      "get": {
+        "summary": "Get Product Detail",
+        "description": "Retrieve detailed information about a specific product",
+        "operationId": "getProductDetail",
+        "tags": ["Product Management"],
+        "parameters": [
+          {
+            "name": "productKey",
+            "in": "query",
+            "description": "Product Key",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Product detail information",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductDetailResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "webhooks": {
@@ -577,6 +1211,694 @@
           "timestamp": {
             "type": "integer",
             "format": "int64"
+          }
+        }
+      },
+      "ProductListResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "description": "Response code"
+          },
+          "msg": {
+            "type": "string",
+            "description": "Response message"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Product"
+            }
+          },
+          "pageNum": {
+            "type": "integer",
+            "description": "Current page number"
+          },
+          "pageSize": {
+            "type": "integer",
+            "description": "Items per page"
+          },
+          "pages": {
+            "type": "integer",
+            "description": "Total pages"
+          },
+          "total": {
+            "type": "integer",
+            "description": "Total count"
+          }
+        }
+      },
+      "Product": {
+        "type": "object",
+        "properties": {
+          "productKey": {
+            "type": "string",
+            "description": "Product key"
+          },
+          "productName": {
+            "type": "string",
+            "description": "Product name"
+          },
+          "accessType": {
+            "type": "integer",
+            "description": "Device type: 0-Direct device 1-Gateway device 2-Gateway sub-device"
+          },
+          "connectPlatform": {
+            "type": "integer",
+            "description": "Access platform: 0-Quectel Cloud Platform, 1-Telecom AEP Platform"
+          },
+          "dataFmt": {
+            "type": "integer",
+            "description": "Data format: 0-Transparent/Custom 3-Thing model"
+          },
+          "netWay": {
+            "type": "string",
+            "description": "Networking method: 1-WiFi(MQTT) 2-2G/3G/4G/5G(MQTT) 3-NB-IoT(LwM2M) 5-Bluetooth(HTTP)"
+          },
+          "logoPath": {
+            "type": "string",
+            "description": "Logo URL"
+          },
+          "createTime": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Creation time"
+          },
+          "updateTime": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Update time"
+          }
+        }
+      },
+      "DeviceCreateRequest": {
+        "type": "object",
+        "required": ["deviceKey", "productKey"],
+        "properties": {
+          "deviceKey": {
+            "type": "string",
+            "description": "Device key (unique identifier)"
+          },
+          "deviceName": {
+            "type": "string",
+            "description": "Device name"
+          },
+          "productKey": {
+            "type": "string",
+            "description": "Product key"
+          },
+          "authMode": {
+            "type": "integer",
+            "description": "Authentication method: 0-Dynamic authentication 1-Static authentication 2-X509",
+            "enum": [0, 1, 2],
+            "default": 0
+          },
+          "sn": {
+            "type": "string",
+            "description": "Device serial number"
+          },
+          "fingerPrint": {
+            "type": "string",
+            "description": "Device fingerprint (required for X509 device addition)"
+          },
+          "psk": {
+            "type": "string",
+            "description": "Pre-shared key (required for China Telecom AEP device addition)"
+          }
+        }
+      },
+      "ApiResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "description": "Response code, 200 indicates success"
+          },
+          "msg": {
+            "type": "string",
+            "description": "Response message"
+          },
+          "data": {
+            "type": "object",
+            "description": "Response data (optional)"
+          }
+        }
+      },
+      "DeviceDetailResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "description": "Response code"
+          },
+          "msg": {
+            "type": "string",
+            "description": "Response message"
+          },
+          "data": {
+            "$ref": "#/components/schemas/DeviceDetail"
+          }
+        }
+      },
+      "DeviceDetail": {
+        "type": "object",
+        "properties": {
+          "deviceKey": {
+            "type": "string",
+            "description": "Device key"
+          },
+          "deviceName": {
+            "type": "string",
+            "description": "Device name"
+          },
+          "productKey": {
+            "type": "string",
+            "description": "Product key"
+          },
+          "deviceStatus": {
+            "type": "integer",
+            "description": "Device status: 1-Online, 0-Offline"
+          },
+          "isActived": {
+            "type": "integer",
+            "description": "Activation status: 1-Activated, 0-Not activated"
+          },
+          "isVerified": {
+            "type": "integer",
+            "description": "Secondary authentication: 0-Not authenticated, 1-Authenticated"
+          },
+          "isVirtual": {
+            "type": "integer",
+            "description": "Virtual device flag: 0-Real, 1-Virtual"
+          },
+          "authMode": {
+            "type": "integer",
+            "description": "Authentication method: 0-Dynamic, 1-Static, 2-X509"
+          },
+          "dataFmt": {
+            "type": "integer",
+            "description": "Data format: 0-Transparent transmission, 3-Thing model"
+          },
+          "sn": {
+            "type": "string",
+            "description": "Device serial number"
+          },
+          "createTime": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Creation timestamp"
+          },
+          "activedTime": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Activation timestamp"
+          },
+          "firstConnTime": {
+            "type": "integer",
+            "format": "int64",
+            "description": "First connection timestamp"
+          },
+          "lastConnTime": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Last connection timestamp"
+          },
+          "lastOfflineTime": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Last offline timestamp"
+          },
+          "updateTime": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Update timestamp"
+          }
+        }
+      },
+      "DeviceDataHistoryResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "description": "Response code"
+          },
+          "msg": {
+            "type": "string",
+            "description": "Response message"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DeviceDataHistory"
+            }
+          },
+          "pageNum": {
+            "type": "integer",
+            "description": "Current page number"
+          },
+          "pageSize": {
+            "type": "integer",
+            "description": "Items per page"
+          },
+          "pages": {
+            "type": "integer",
+            "description": "Total pages"
+          },
+          "total": {
+            "type": "integer",
+            "description": "Total count"
+          }
+        }
+      },
+      "DeviceDataHistory": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Record ID"
+          },
+          "deviceKey": {
+            "type": "string",
+            "description": "Device key"
+          },
+          "deviceId": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Device ID"
+          },
+          "productId": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Product ID"
+          },
+          "productKey": {
+            "type": "string",
+            "description": "Product key"
+          },
+          "direction": {
+            "type": "integer",
+            "description": "Data direction: 1-Uplink, 2-Downlink"
+          },
+          "data": {
+            "type": "string",
+            "description": "Base64 encoded raw data"
+          },
+          "dataType": {
+            "type": "string",
+            "description": "Data type"
+          },
+          "sendStatus": {
+            "type": "integer",
+            "description": "Send status: 0-Not sent, 1-Sent, -1-Send failed"
+          },
+          "sendTime": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Send time"
+          },
+          "createTime": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Creation time"
+          },
+          "updateTime": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Update time"
+          },
+          "ticket": {
+            "type": "string",
+            "description": "Unique data value"
+          },
+          "sourceType": {
+            "type": "string",
+            "description": "Source type"
+          },
+          "msgType": {
+            "type": "string",
+            "description": "Message type"
+          },
+          "dmData": {
+            "type": "string",
+            "description": "JSON of thing model data"
+          },
+          "extData": {
+            "type": "object",
+            "description": "Extended data"
+          }
+        }
+      },
+      "DeviceLocationResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "description": "Response code"
+          },
+          "msg": {
+            "type": "string",
+            "description": "Response message"
+          },
+          "data": {
+            "$ref": "#/components/schemas/DeviceLocation"
+          }
+        }
+      },
+      "DeviceLocation": {
+        "type": "object",
+        "properties": {
+          "latitude": {
+            "type": "number",
+            "format": "double",
+            "description": "Latitude coordinate"
+          },
+          "longitude": {
+            "type": "number",
+            "format": "double",
+            "description": "Longitude coordinate"
+          },
+          "accuracy": {
+            "type": "number",
+            "format": "double",
+            "description": "Location accuracy in meters"
+          },
+          "altitude": {
+            "type": "number",
+            "format": "double",
+            "description": "Altitude in meters"
+          },
+          "timestamp": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Location timestamp"
+          },
+          "deviceKey": {
+            "type": "string",
+            "description": "Device key"
+          },
+          "productKey": {
+            "type": "string",
+            "description": "Product key"
+          }
+        }
+      },
+      "DeviceResourceResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "description": "Response code"
+          },
+          "msg": {
+            "type": "string",
+            "description": "Response message"
+          },
+          "data": {
+            "$ref": "#/components/schemas/DeviceResource"
+          }
+        }
+      },
+      "DeviceResource": {
+        "type": "object",
+        "properties": {
+          "deviceKey": {
+            "type": "string",
+            "description": "Device key"
+          },
+          "productKey": {
+            "type": "string",
+            "description": "Product key"
+          },
+          "batteryLevel": {
+            "type": "integer",
+            "description": "Battery level percentage"
+          },
+          "signalStrength": {
+            "type": "integer",
+            "description": "Signal strength"
+          },
+          "networkType": {
+            "type": "string",
+            "description": "Network type (2G/3G/4G/5G/WiFi)"
+          },
+          "firmwareVersion": {
+            "type": "string",
+            "description": "Firmware version"
+          },
+          "hardwareVersion": {
+            "type": "string",
+            "description": "Hardware version"
+          },
+          "lastUpdateTime": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Last update timestamp"
+          }
+        }
+      },
+      "DeviceReadDataRequest": {
+        "type": "object",
+        "required": ["data", "devices", "productKey"],
+        "properties": {
+          "data": {
+            "type": "string",
+            "description": "JSON array of thing model identifiers to read"
+          },
+          "devices": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "List of device keys"
+          },
+          "productKey": {
+            "type": "string",
+            "description": "Product key"
+          },
+          "cacheTime": {
+            "type": "integer",
+            "description": "Cache duration in seconds",
+            "default": 600
+          },
+          "isCache": {
+            "type": "boolean",
+            "description": "Enable caching",
+            "default": false
+          },
+          "isCover": {
+            "type": "boolean",
+            "description": "Overwrite previous data",
+            "default": false
+          },
+          "qos": {
+            "type": "integer",
+            "description": "QoS level",
+            "default": 1
+          }
+        }
+      },
+      "DeviceWriteDataRequest": {
+        "type": "object",
+        "required": ["data", "devices", "productKey"],
+        "properties": {
+          "data": {
+            "type": "string",
+            "description": "JSON formatted thing model property data"
+          },
+          "devices": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "List of device keys"
+          },
+          "productKey": {
+            "type": "string",
+            "description": "Product key"
+          },
+          "cacheTime": {
+            "type": "integer",
+            "description": "Cache time in seconds",
+            "default": 600
+          },
+          "isCache": {
+            "type": "boolean",
+            "description": "Enable caching",
+            "default": false
+          },
+          "isCover": {
+            "type": "boolean",
+            "description": "Overwrite previous data",
+            "default": false
+          },
+          "qos": {
+            "type": "integer",
+            "description": "QoS level",
+            "default": 1
+          }
+        }
+      },
+      "DeviceSendRawDataRequest": {
+        "type": "object",
+        "required": ["data", "devices"],
+        "properties": {
+          "data": {
+            "type": "object",
+            "description": "Raw data content to send"
+          },
+          "devices": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DevicePrimaryKey"
+            },
+            "description": "Array of device identifiers"
+          },
+          "encode": {
+            "type": "string",
+            "enum": ["Hex", "Text"],
+            "description": "Data encoding format"
+          },
+          "cacheTime": {
+            "type": "integer",
+            "description": "Cache time in seconds",
+            "default": 600
+          },
+          "isCache": {
+            "type": "boolean",
+            "description": "Enable caching",
+            "default": false
+          },
+          "isCover": {
+            "type": "boolean",
+            "description": "Overwrite previous data",
+            "default": false
+          },
+          "qos": {
+            "type": "integer",
+            "description": "QoS level",
+            "default": 1
+          }
+        }
+      },
+      "DevicePrimaryKey": {
+        "type": "object",
+        "required": ["deviceKey", "productKey"],
+        "properties": {
+          "deviceKey": {
+            "type": "string",
+            "description": "Device key"
+          },
+          "productKey": {
+            "type": "string",
+            "description": "Product key"
+          }
+        }
+      },
+      "DeviceDataOperationResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "description": "Response code"
+          },
+          "msg": {
+            "type": "string",
+            "description": "Response message"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DeviceOperationResult"
+            }
+          }
+        }
+      },
+      "DeviceOperationResult": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "description": "Operation result code"
+          },
+          "productKey": {
+            "type": "string",
+            "description": "Product key"
+          },
+          "deviceKey": {
+            "type": "string",
+            "description": "Device key"
+          },
+          "ticket": {
+            "type": "string",
+            "description": "Operation ticket"
+          },
+          "message": {
+            "type": "string",
+            "description": "Operation message"
+          }
+        }
+      },
+      "ProductDetailResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "description": "Response code"
+          },
+          "msg": {
+            "type": "string",
+            "description": "Response message"
+          },
+          "data": {
+            "$ref": "#/components/schemas/ProductDetail"
+          }
+        }
+      },
+      "ProductDetail": {
+        "type": "object",
+        "properties": {
+          "productKey": {
+            "type": "string",
+            "description": "Product key"
+          },
+          "productName": {
+            "type": "string",
+            "description": "Product name"
+          },
+          "accessType": {
+            "type": "integer",
+            "description": "Device type: 0-Direct device, 1-Gateway device, 2-Gateway sub-device"
+          },
+          "connectPlatform": {
+            "type": "integer",
+            "description": "Access platform: 0-Quectel Cloud Platform, 1-Telecom AEP Platform"
+          },
+          "dataFmt": {
+            "type": "integer",
+            "description": "Data format: 0-Transparent/Custom, 3-Thing model"
+          },
+          "netWay": {
+            "type": "string",
+            "description": "Networking method: 1-WiFi(MQTT), 2-2G/3G/4G/5G(MQTT), 3-NB-IoT(LwM2M), 5-Bluetooth(HTTP)"
+          },
+          "logoPath": {
+            "type": "string",
+            "description": "Logo URL"
+          },
+          "productConfig": {
+            "type": "object",
+            "description": "Product configuration"
+          },
+          "createTime": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Creation time"
+          },
+          "updateTime": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Update time"
           }
         }
       },

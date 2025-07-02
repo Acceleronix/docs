@@ -1,0 +1,169 @@
+---
+title: 'Get Device Data History'
+openapi: 'GET /v2/quecdatastorage/r1/openapi/device/data/history'
+---
+
+Query device historical uplink/downlink data logs. This endpoint provides access to all communication data between devices and the IoT platform with comprehensive filtering and pagination.
+
+## Authentication Required
+
+This endpoint requires a valid QJWT access token. Include your token in the Authorization header:
+
+```
+Authorization: QJWT your_access_token_here
+```
+
+To obtain an access token, use the [Get Access Token](/api-reference/endpoint/webhook) endpoint.
+
+## Device Identification
+
+You can identify the device using either method:
+
+### Method 1: Device ID (Recommended)
+- **deviceId**: Direct device ID (takes precedence if both methods provided)
+
+### Method 2: Product Key + Device Key
+- **productKey**: Product identifier
+- **deviceKey**: Device identifier
+
+**Note**: If both methods are provided, deviceId takes precedence.
+
+## Filtering Parameters
+
+### Time Range Filtering
+- **beginDateTimp**: Start time timestamp in milliseconds
+- **endDateTimp**: End time timestamp in milliseconds
+
+### Data Direction Filtering
+- **direction**: Filter by data direction
+  - `1`: Uplink data (device → platform)
+  - `2`: Downlink data (platform → device)
+
+### Send Status Filtering
+- **sendStatus**: Filter by transmission status
+  - `0`: Not sent
+  - `1`: Successfully sent
+  - `-1`: Send failed
+
+### Language Settings
+- **language**: Response language (default: CN)
+  - `CN`: Chinese
+  - `EN`: English
+
+## Pagination
+
+- **pageNum**: Page number (default: 1)
+- **pageSize**: Items per page (default: 10)
+
+## Response Data
+
+### Metadata
+- **pageNum**: Current page number
+- **pageSize**: Items per page
+- **pages**: Total pages
+- **total**: Total record count
+
+### Data Records
+Each record includes:
+
+#### Basic Information
+- **id**: Unique record identifier
+- **deviceKey**: Device identifier
+- **deviceId**: Device ID
+- **productKey**: Product identifier
+- **productId**: Product ID
+
+#### Data Content
+- **data**: Base64 encoded raw device data
+- **dmData**: Parsed JSON thing model data (if applicable)
+- **dataType**: Type of data transmitted
+
+#### Communication Details
+- **direction**: Data direction (1=Uplink, 2=Downlink)
+- **sendStatus**: Send status (0/1/-1)
+- **sendTime**: Timestamp when data was sent
+- **ticket**: Unique data value for tracking
+
+#### Additional Fields
+- **sourceType**: Source type of the data
+- **msgType**: Message type classification
+- **extData**: Extended data object
+- **createTime**: Record creation time
+- **updateTime**: Last update time
+
+## Usage Examples
+
+### Get Recent Uplink Data
+```bash
+curl -X GET "https://iot-api.acceleronix.io/v2/quecdatastorage/r1/openapi/device/data/history?deviceKey=DK00001&productKey=PK0001&direction=1&pageSize=20" \
+  -H "Authorization: QJWT your_access_token_here"
+```
+
+### Get Data Within Time Range
+```bash
+curl -X GET "https://iot-api.acceleronix.io/v2/quecdatastorage/r1/openapi/device/data/history?deviceId=123456&beginDateTimp=1609459200000&endDateTimp=1609545600000" \
+  -H "Authorization: QJWT your_access_token_here"
+```
+
+### Get Failed Transmissions
+```bash
+curl -X GET "https://iot-api.acceleronix.io/v2/quecdatastorage/r1/openapi/device/data/history?deviceKey=DK00001&productKey=PK0001&sendStatus=-1" \
+  -H "Authorization: QJWT your_access_token_here"
+```
+
+## Response Example
+
+```json
+{
+  "code": 200,
+  "data": [
+    {
+      "id": "rec_001",
+      "deviceKey": "DK00001",
+      "deviceId": 123456,
+      "productKey": "PK0001",
+      "productId": 1001,
+      "direction": 1,
+      "data": "SGVsbG8gV29ybGQ=",
+      "dmData": "{\"temperature\": 25.6, \"humidity\": 60.2}",
+      "dataType": "sensor_data",
+      "sendStatus": 1,
+      "sendTime": "2024-01-15T10:30:00Z",
+      "createTime": "2024-01-15T10:30:00Z",
+      "updateTime": "2024-01-15T10:30:00Z",
+      "ticket": "tick_001",
+      "sourceType": "device",
+      "msgType": "property_report",
+      "extData": {}
+    }
+  ],
+  "msg": "",
+  "pageNum": 1,
+  "pageSize": 10,
+  "pages": 1,
+  "total": 1
+}
+```
+
+## Error Handling
+
+Common error responses:
+- **400**: Bad request - Invalid parameters
+- **401**: Unauthorized - Invalid or expired token
+- **50000**: Service exception
+- **50005**: Parameter check error
+- **50007**: The deviceID, productKey or deviceKey is empty
+- **70000**: Hub service unavailable
+- **70089**: Limited permission to operate this project/product/device
+- **70130**: Non-existent device
+- **91001**: Token does not exist
+- **91004**: Token incorrect
+- **91005**: Insufficient permissions
+
+## Use Cases
+
+- **Data analysis**: Analyze historical device communication patterns
+- **Troubleshooting**: Debug communication issues and failed transmissions
+- **Monitoring**: Track device data transmission status and frequency
+- **Auditing**: Maintain logs of all device communications
+- **Integration**: Export data for external analytics systems

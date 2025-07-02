@@ -1,0 +1,87 @@
+---
+title: 'Get Product List'
+openapi: 'GET /v2/quecproductmgr/r3/openapi/products'
+---
+
+Query product list with pagination support. This endpoint allows you to retrieve all products under your account with optional filtering by product key.
+
+## Authentication Required
+
+This endpoint requires a valid QJWT access token. Include your token in the Authorization header:
+
+```
+Authorization: QJWT your_access_token_here
+```
+
+To obtain an access token, use the [Get Access Token](/api-reference/endpoint/webhook) endpoint.
+
+## Request Parameters
+
+- **pageNum** (optional): Page number, default is 1
+- **pageSize** (optional): Page size (items per page), default is 10  
+- **productKey** (optional): Filter by specific product key
+
+## Response
+
+The response includes:
+- **data**: Array of product objects
+- **pageNum**: Current page number
+- **pageSize**: Items per page
+- **pages**: Total number of pages
+- **total**: Total count of products
+
+### Product Object Fields
+
+Each product in the data array contains:
+- **productKey**: Unique product identifier
+- **productName**: Human-readable product name
+- **accessType**: Device type (0=Direct device, 1=Gateway device, 2=Gateway sub-device)
+- **connectPlatform**: Access platform (0=Quectel Cloud, 1=Telecom AEP)
+- **dataFmt**: Data format (0=Transparent/Custom, 3=Thing model)
+- **netWay**: Networking method (1=WiFi/MQTT, 2=Cellular/MQTT, 3=NB-IoT/LwM2M, 5=Bluetooth/HTTP)
+- **logoPath**: Product logo URL
+- **createTime**: Product creation timestamp
+- **updateTime**: Last update timestamp
+
+## Error Handling
+
+Common error responses:
+- **401**: Unauthorized - Invalid or expired token
+- **403**: Forbidden - Insufficient permissions
+- **50000**: Service exception
+- **91001**: Token does not exist
+- **91004**: Token incorrect
+- **91005**: Insufficient permissions
+
+## Usage Example
+
+```bash
+curl -X GET "https://iot-api.acceleronix.io/v2/quecproductmgr/r3/openapi/products?pageNum=1&pageSize=10" \
+  -H "Authorization: QJWT your_access_token_here"
+```
+
+### Response Example
+
+```json
+{
+  "code": 200,
+  "data": [
+    {
+      "productKey": "PK0001",
+      "productName": "Smart Temperature Sensor",
+      "accessType": 0,
+      "connectPlatform": 0,
+      "dataFmt": 3,
+      "netWay": "2",
+      "logoPath": null,
+      "createTime": "1730871606221",
+      "updateTime": ""
+    }
+  ],
+  "msg": "",
+  "pageNum": 1,
+  "pageSize": 10,
+  "pages": 1,
+  "total": 1
+}
+```
