@@ -1,4 +1,31 @@
 ---
-title: 'Delete Plant'
-openapi: 'DELETE /plants/{id}'
+title: 'Refresh Access Token'
+openapi: 'GET /v2/quecauth/accessKeyAuthrize/refreshToken'
 ---
+
+Refresh your JWT access token to extend its validity. Tokens are valid for 2 hours, and it's recommended to refresh them every hour to ensure continuous access.
+
+## No Authentication Required
+
+This endpoint does not require authentication as it uses the refresh token to obtain a new access token.
+
+## Token Refresh Rules
+
+- If the token has been refreshed within the last 30 minutes or was created within the last 30 minutes, the original token is returned
+- If the user or AccessKey is disabled, the refresh will fail and the original token will be disabled
+
+## Example Usage
+
+Refresh an existing token:
+
+```bash
+curl -X GET "https://iot-api.acceleronix.io/v2/quecauth/accessKeyAuthrize/refreshToken?grant_type=refresh_token&refresh_token=YOUR_REFRESH_TOKEN" \
+  -H "Content-Type: application/json"
+```
+
+With specific scope:
+
+```bash
+curl -X GET "https://iot-api.acceleronix.io/v2/quecauth/accessKeyAuthrize/refreshToken?grant_type=refresh_token&refresh_token=YOUR_REFRESH_TOKEN&scope=userinfo" \
+  -H "Content-Type: application/json"
+```

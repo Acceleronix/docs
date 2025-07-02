@@ -1,4 +1,24 @@
 ---
-title: 'Get Plants'
-openapi: 'GET /plants'
+title: 'Get Product TSL Model'
+openapi: 'GET /v2/quectsl/openapi/product/export/tslFile'
 ---
+
+This endpoint retrieves the Thing Specification Language (TSL) model for a product, which defines the properties, services, and events that devices of this product type support.
+
+## Authentication Required
+
+This endpoint requires a valid JWT token obtained through the authentication API. Include the token in the Authorization header:
+
+```
+Authorization: Bearer YOUR_JWT_TOKEN
+```
+
+## Example Usage
+
+Get TSL model for a specific product:
+
+```bash
+curl -X GET "https://iot-api.acceleronix.io/v2/quectsl/openapi/product/export/tslFile?productKey=p11v14&language=EN" \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+  -H "Content-Type: application/json"
+```

@@ -1,33 +1,121 @@
 ---
-title: 'Introduction'
-description: 'Example section for showcasing API endpoints'
+title: 'SaaS IoT API Introduction'
+description: 'Complete guide to Acceleronix SaaS IoT platform APIs'
 ---
 
-<Note>
-  If you're not looking to build API reference documentation, you can delete
-  this section by removing the api-reference folder.
-</Note>
+## Welcome to SaaS IoT API
 
-## Welcome
-
-There are two ways to build API documentation: [OpenAPI](https://mintlify.com/docs/api-playground/openapi/setup) and [MDX components](https://mintlify.com/docs/api-playground/mdx/configuration). For the starter kit, we are using the following OpenAPI specification.
+The Acceleronix SaaS IoT platform provides comprehensive APIs for device management, product configuration, data access, and real-time monitoring. This API playground allows you to test all endpoints with live data.
 
 <Card
-  title="Plant Store Endpoints"
-  icon="leaf"
-  href="https://github.com/mintlify/starter/blob/main/api-reference/openapi.json"
+  title="OpenAPI Specification"
+  icon="code"
+  href="/api-reference/openapi.json"
 >
-  View the OpenAPI specification file
+  View the complete OpenAPI specification
 </Card>
 
-## Authentication
+## Getting Started
 
-All API endpoints are authenticated using Bearer tokens and picked up from the specification file.
+### Prerequisites
+
+Before using the API, you need to:
+
+1. **Create a SaaS Application** in "SaaS Development" → "SaaS Management"
+2. **Enable API Services** on the "Service" page - authorize the API service packages you need
+3. **Authorize Products** on the "Product" page - specify which product data your application can access
+4. **Obtain Credentials** - get your AccessKey and AccessSecret for authentication
+
+### Authentication Flow
+
+SaaS IoT APIs use JWT (JSON Web Token) authentication. Follow these steps:
+
+1. **Get Access Token**: Use your AccessKey/AccessSecret to obtain a JWT token
+2. **Use Token**: Include the JWT token in all API requests
+3. **Refresh Token**: Refresh your token before it expires (recommended every hour)
+
+## Authentication Details
+
+### Step 1: Obtain JWT Token
+
+Use the authentication endpoint with your AccessKey and AccessSecret:
+
+```bash
+POST /v2/quecauth/accessKeyAuthrize/accessKeyLogin
+```
+
+**Username Generation**:
+```
+ver=1&auth_mode=accessKey&sign_method=sha256&access_key=${AccessKey}&timestamp=${timestamp}
+```
+
+**Password Generation**:
+```
+SHA256("${username}${AccessSecret}")
+```
+
+### Step 2: Use Bearer Token
+
+Include the JWT token in the Authorization header for all API requests:
+
+```bash
+Authorization: Bearer YOUR_JWT_TOKEN
+```
+
+### Step 3: Token Management
+
+- **Validity**: Tokens are valid for 2 hours
+- **Refresh**: Use the refresh token endpoint to extend validity
+- **Best Practice**: Refresh tokens every hour to ensure continuous access
+
+## API Categories
+
+### 🔐 Authentication APIs
+- Get access token using AccessKey/AccessSecret
+- Refresh existing tokens
+- Manage token lifecycle
+
+### 📦 Product Management APIs  
+- Query product information
+- Retrieve Thing Specification Language (TSL) models
+- Access product configurations
+
+### 🔌 Device Management APIs
+- List devices under products
+- Query device status and details
+- Monitor device connectivity
+
+### 📊 Data Access APIs
+- Read device data and telemetry
+- Access historical data
+- Manage device properties
+
+## Error Handling
+
+All APIs return standardized error responses:
 
 ```json
-"security": [
-  {
-    "bearerAuth": []
-  }
-]
+{
+  "code": 400,
+  "msg": "Error description",
+  "error": "Detailed error message"
+}
 ```
+
+Common status codes:
+- `200`: Success
+- `401`: Unauthorized (invalid or expired token)
+- `403`: Forbidden (insufficient permissions)
+- `404`: Not Found
+- `50000`: Service exception
+- `91001`: Token does not exist
+
+## Rate Limits
+
+API calls are subject to rate limiting to ensure service stability. If you exceed the rate limit, you'll receive a `429 Too Many Requests` response.
+
+## Support
+
+For technical support and questions:
+- Email: support@acceleronix.io
+- Documentation: This API playground provides interactive examples for all endpoints

@@ -1,4 +1,129 @@
 ---
-title: 'New Plant'
-openapi: 'WEBHOOK /plant/webhook'
+title: 'Get Access Token'
+openapi: 'GET /v2/quecauth/accessKeyAuthrize/accessKeyLogin'
 ---
+
+Obtain a JWT access token using AccessKey and AccessSecret authentication. This is the primary authentication method for accessing SaaS IoT APIs.
+
+## No Authentication Required
+
+This endpoint does not require authentication as it is used to obtain the initial access token.
+
+## Authentication Process
+
+1. **Generate Username**: Create a URL-encoded string with your AccessKey and current timestamp
+2. **Generate Password**: Create a SHA256 hash of the username concatenated with your AccessSecret
+3. **Make Request**: Send GET request with the generated username and password
+
+## Username Generation Rules
+
+The username field is formed in key=value format, with fields joined using "&" character:
+
+```
+ver=1&auth_mode=accessKey&sign_method=sha256&access_key=${AccessKey}&timestamp=${timestamp}
+```
+
+Then URL encode the entire string.
+
+## Password Generation Rules
+
+```
+SHA256("${username}${AccessSecret}")
+```
+
+## Step-by-Step Guide
+
+### Prerequisites
+- Your **AccessKey** (from SaaS platform)
+- Your **AccessSecret** (from SaaS platform)
+
+### Step 1: Generate Timestamp
+```javascript
+// JavaScript
+const timestamp = Date.now().toString();
+
+// Python
+import time
+timestamp = str(int(time.time() * 1000))
+
+// Bash
+TIMESTAMP=$(date +%s%3N)
+```
+
+### Step 2: Create Username String
+Format: `ver=1&auth_mode=accessKey&sign_method=sha256&access_key=${YOUR_ACCESS_KEY}&timestamp=${timestamp}`
+
+```javascript
+// JavaScript example (replace YOUR_ACCESS_KEY with your actual AccessKey)
+const username = `ver=1&auth_mode=accessKey&sign_method=sha256&access_key=${YOUR_ACCESS_KEY}&timestamp=${timestamp}`;
+```
+
+### Step 3: URL Encode Username
+```javascript
+// JavaScript
+const usernameEncoded = encodeURIComponent(username);
+
+// Python
+import urllib.parse
+username_encoded = urllib.parse.quote(username)
+```
+
+### Step 4: Generate SHA256 Password
+Concatenate username (before encoding) + YOUR_ACCESS_SECRET, then SHA256 hash:
+
+```javascript
+// JavaScript (using crypto)
+const crypto = require('crypto');
+const password = crypto.createHash('sha256').update(username + YOUR_ACCESS_SECRET).digest('hex');
+
+// Python
+import hashlib
+password = hashlib.sha256((username + YOUR_ACCESS_SECRET).encode()).hexdigest()
+```
+
+### Step 5: Make API Request
+
+#### Using Hoppscotch/Postman:
+1. **Method**: GET
+2. **URL**: `https://iot-api.acceleronix.io/v2/quecauth/accessKeyAuthrize/accessKeyLogin`
+3. **Headers**:
+   - `Content-Type: application/json`
+4. **Query Parameters**:
+   - `grant_type`: `password`
+   - `username`: `[YOUR_ENCODED_USERNAME]`
+   - `password`: `[YOUR_SHA256_HASH]`
+
+### Complete Bash Template:
+```bash
+# REPLACE THESE WITH YOUR ACTUAL CREDENTIALS
+ACCESS_KEY="YOUR_ACCESS_KEY_HERE"
+ACCESS_SECRET="YOUR_ACCESS_SECRET_HERE"
+
+# Step 1: Generate timestamp
+TIMESTAMP=$(date +%s%3N)
+
+# Step 2: Create username
+USERNAME="ver=1&auth_mode=accessKey&sign_method=sha256&access_key=${ACCESS_KEY}&timestamp=${TIMESTAMP}"
+
+# Step 3: URL encode username
+USERNAME_ENCODED=$(python3 -c "import urllib.parse; print(urllib.parse.quote('${USERNAME}'))")
+
+# Step 4: Generate password
+PASSWORD=$(echo -n "${USERNAME}${ACCESS_SECRET}" | sha256sum | awk '{print $1}')
+
+# Step 5: Make request
+curl -X GET "https://iot-api.acceleronix.io/v2/quecauth/accessKeyAuthrize/accessKeyLogin?grant_type=password&username=${USERNAME_ENCODED}&password=${PASSWORD}" \
+  -H "Content-Type: application/json"
+```
+
+### ⚠️ Important Notes
+- Replace `YOUR_ACCESS_KEY_HERE` and `YOUR_ACCESS_SECRET_HERE` with your actual credentials
+- Keep your AccessSecret secure and never share it
+- The timestamp should be current time in milliseconds
+
+## Response
+
+Successful response includes:
+- `access_token`: JWT token for API authentication  
+- `expires_in`: Token validity period (86400 seconds = 24 hours)
+- `token_type`: Always "jwt"

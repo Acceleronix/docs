@@ -1,4 +1,32 @@
 ---
-title: 'Create Plant'
-openapi: 'POST /plants'
+title: 'Get Device List'
+openapi: 'GET /v2/devicemgr/r3/openapi/product/device/overview'
 ---
+
+Query the list of devices under a specific product. This endpoint supports pagination and filtering by device status and activation status.
+
+## Authentication Required
+
+This endpoint requires a valid JWT token obtained through the authentication API. Include the token in the Authorization header:
+
+```
+Authorization: Bearer YOUR_JWT_TOKEN
+```
+
+## Example Usage
+
+Get all devices for a product:
+
+```bash
+curl -X GET "https://iot-api.acceleronix.io/v2/devicemgr/r3/openapi/product/device/overview?productKey=PK0001&pageNum=1&pageSize=10" \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+  -H "Content-Type: application/json"
+```
+
+Filter online devices only:
+
+```bash
+curl -X GET "https://iot-api.acceleronix.io/v2/devicemgr/r3/openapi/product/device/overview?productKey=PK0001&deviceStatus=1" \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+  -H "Content-Type: application/json"
+```

@@ -27,18 +27,28 @@
         "tab": "API Reference",
         "groups": [
           {
-            "group": "API Documentation",
+            "group": "Getting Started",
             "pages": [
               "api-reference/introduction"
             ]
           },
           {
-            "group": "Endpoint Examples",
+            "group": "Authentication",
             "pages": [
-              "api-reference/endpoint/get",
-              "api-reference/endpoint/create",
-              "api-reference/endpoint/delete",
-              "api-reference/endpoint/webhook"
+              "api-reference/endpoint/webhook",
+              "api-reference/endpoint/delete"
+            ]
+          },
+          {
+            "group": "Product Management",
+            "pages": [
+              "api-reference/endpoint/get"
+            ]
+          },
+          {
+            "group": "Device Management",
+            "pages": [
+              "api-reference/endpoint/create"
             ]
           }
         ]

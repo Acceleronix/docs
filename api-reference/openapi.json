@@ -1,16 +1,18 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "OpenAPI Plant Store",
-    "description": "A sample API that uses a plant store as an example to demonstrate features in the OpenAPI specification",
-    "license": {
-      "name": "MIT"
+    "title": "SaaS IoT OpenAPI",
+    "description": "Acceleronix SaaS IoT platform API for device management, product configuration, and data access",
+    "contact": {
+      "name": "Acceleronix Support",
+      "email": "support@acceleronix.io"
     },
-    "version": "1.0.0"
+    "version": "2.0.0"
   },
   "servers": [
     {
-      "url": "http://sandbox.mintlify.com"
+      "url": "https://iot-api.acceleronix.io",
+      "description": "Production Server"
     }
   ],
   "security": [
@@ -19,36 +21,55 @@
     }
   ],
   "paths": {
-    "/plants": {
+    "/v2/quecauth/accessKeyAuthrize/accessKeyLogin": {
       "get": {
-        "description": "Returns all plants from the system that the user has access to",
+        "summary": "Get Access Token by Login Authentication",
+        "description": "Obtain JWT access token using AccessKey and AccessSecret authentication",
+        "operationId": "getAccessToken",
+        "tags": ["Authentication"],
         "parameters": [
           {
-            "name": "limit",
+            "name": "grant_type",
             "in": "query",
-            "description": "The maximum number of results to return",
+            "description": "Authorization type. Fixed value: password",
+            "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int32"
+              "type": "string",
+              "enum": ["password"]
+            }
+          },
+          {
+            "name": "username",
+            "in": "query",
+            "description": "Username in encoded format: ver=1&auth_mode=accessKey&sign_method=sha256&access_key=${AccessKey}&timestamp=${timestamp}",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "password",
+            "in": "query",
+            "description": "SHA256 hash of username + AccessSecret",
+            "required": true,
+            "schema": {
+              "type": "string"
             }
           }
         ],
         "responses": {
           "200": {
-            "description": "Plant response",
+            "description": "Successful authentication",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Plant"
-                  }
+                  "$ref": "#/components/schemas/TokenResponse"
                 }
               }
             }
           },
-          "400": {
-            "description": "Unexpected error",
+          "401": {
+            "description": "Unauthorized",
             "content": {
               "application/json": {
                 "schema": {
@@ -57,34 +78,61 @@
               }
             }
           }
-        }
-      },
-      "post": {
-        "description": "Creates a new plant in the store",
-        "requestBody": {
-          "description": "Plant to add to the store",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/NewPlant"
-              }
+        },
+        "security": []
+      }
+    },
+    "/v2/quectsl/openapi/product/export/tslFile": {
+      "get": {
+        "summary": "Get Product TSL Model",
+        "description": "Query latest product Thing Model (JSON format)",
+        "operationId": "getProductTSL",
+        "tags": ["Product Management"],
+        "parameters": [
+          {
+            "name": "productKey",
+            "in": "query",
+            "description": "Product Key",
+            "required": false,
+            "schema": {
+              "type": "string"
             }
           },
-          "required": true
-        },
+          {
+            "name": "productId",
+            "in": "query",
+            "description": "Product ID",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "language",
+            "in": "query",
+            "description": "Language: CN/EN (default: CN)",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["CN", "EN"],
+              "default": "CN"
+            }
+          }
+        ],
         "responses": {
           "200": {
-            "description": "plant response",
+            "description": "Product TSL data",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Plant"
+                  "$ref": "#/components/schemas/TSLResponse"
                 }
               }
             }
           },
           "400": {
-            "description": "unexpected error",
+            "description": "Bad request",
             "content": {
               "application/json": {
                 "schema": {
@@ -96,28 +144,80 @@
         }
       }
     },
-    "/plants/{id}": {
-      "delete": {
-        "description": "Deletes a single plant based on the ID supplied",
+    "/v2/devicemgr/r3/openapi/product/device/overview": {
+      "get": {
+        "summary": "Get Device List",
+        "description": "Query device list under product",
+        "operationId": "getDeviceList",
+        "tags": ["Device Management"],
         "parameters": [
           {
-            "name": "id",
-            "in": "path",
-            "description": "ID of plant to delete",
+            "name": "productKey",
+            "in": "query",
+            "description": "Product Key",
             "required": true,
             "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "pageNum",
+            "in": "query",
+            "description": "Page number (default: 1)",
+            "required": false,
+            "schema": {
               "type": "integer",
-              "format": "int64"
+              "format": "int32",
+              "default": 1
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "description": "Page size (default: 10)",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 10
+            }
+          },
+          {
+            "name": "deviceStatus",
+            "in": "query",
+            "description": "Device status: 1-Online, 0-Offline",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "enum": [0, 1]
+            }
+          },
+          {
+            "name": "activeStatus",
+            "in": "query",
+            "description": "Activation status: 1-Activated, 0-Not activated",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "enum": [0, 1]
             }
           }
         ],
         "responses": {
-          "204": {
-            "description": "Plant deleted",
-            "content": {}
+          "200": {
+            "description": "Device list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeviceListResponse"
+                }
+              }
+            }
           },
           "400": {
-            "description": "unexpected error",
+            "description": "Bad request",
             "content": {
               "application/json": {
                 "schema": {
@@ -128,18 +228,79 @@
           }
         }
       }
+    },
+    "/v2/quecauth/accessKeyAuthrize/refreshToken": {
+      "get": {
+        "summary": "Refresh Access Token",
+        "description": "Refresh JWT access token",
+        "operationId": "refreshToken",
+        "tags": ["Authentication"],
+        "parameters": [
+          {
+            "name": "grant_type",
+            "in": "query",
+            "description": "Authorization type, fixed as refresh_token",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": ["refresh_token"]
+            }
+          },
+          {
+            "name": "refresh_token",
+            "in": "query",
+            "description": "Token to be refreshed",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "scope",
+            "in": "query",
+            "description": "Authorization scope",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Token refreshed successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TokenResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
     }
   },
   "webhooks": {
-    "/plant/webhook": {
+    "/device/event": {
       "post": {
-        "description": "Information about a new plant added to the store",
+        "description": "Device event notification webhook",
         "requestBody": {
-          "description": "Plant added to the store",
+          "description": "Device event data",
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/NewPlant"
+                "$ref": "#/components/schemas/DeviceEvent"
               }
             }
           }
@@ -154,55 +315,285 @@
   },
   "components": {
     "schemas": {
-      "Plant": {
-        "required": [
-          "name"
-        ],
+      "TokenResponse": {
         "type": "object",
         "properties": {
-          "name": {
-            "description": "The name of the plant",
-            "type": "string"
+          "code": {
+            "type": "integer",
+            "description": "Response code, 200 indicates success"
           },
-          "tag": {
-            "description": "Tag to specify the type",
-            "type": "string"
+          "msg": {
+            "type": "string",
+            "description": "Response message"
+          },
+          "access_token": {
+            "type": "string",
+            "description": "JWT access token"
+          },
+          "token_type": {
+            "type": "string",
+            "description": "Token type, fixed as jwt"
+          },
+          "expires_in": {
+            "type": "integer",
+            "description": "Token expiration time in seconds"
+          },
+          "scope": {
+            "type": "string",
+            "description": "Authorization scope"
           }
         }
       },
-      "NewPlant": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/Plant"
+      "TSLResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "description": "Response code"
           },
-          {
-            "required": [
-              "id"
-            ],
+          "msg": {
+            "type": "string",
+            "description": "Response message"
+          },
+          "data": {
             "type": "object",
             "properties": {
-              "id": {
-                "description": "Identification number of the plant",
-                "type": "integer",
-                "format": "int64"
+              "profile": {
+                "type": "object",
+                "properties": {
+                  "tslVersion": {
+                    "type": "string"
+                  },
+                  "productKey": {
+                    "type": "string"
+                  },
+                  "version": {
+                    "type": "string"
+                  }
+                }
+              },
+              "properties": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/TSLProperty"
+                }
+              },
+              "services": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/TSLService"
+                }
+              },
+              "events": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/TSLEvent"
+                }
               }
             }
           }
-        ]
+        }
       },
-      "Error": {
-        "required": [
-          "error",
-          "message"
-        ],
+      "TSLProperty": {
         "type": "object",
         "properties": {
-          "error": {
-            "type": "integer",
-            "format": "int32"
+          "id": {
+            "type": "integer"
           },
-          "message": {
+          "code": {
             "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "dataType": {
+            "type": "string",
+            "enum": ["BOOL", "INT", "FLOAT", "DOUBLE", "TEXT", "DATE", "ENUM", "STRUCT", "ARRAY", "RAW"]
+          },
+          "subType": {
+            "type": "string",
+            "enum": ["R", "W", "RW"]
+          },
+          "specs": {
+            "type": "object"
+          }
+        }
+      },
+      "TSLService": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "code": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "subType": {
+            "type": "string",
+            "enum": ["ASYNC", "SYNC"]
+          },
+          "inputData": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TSLProperty"
+            }
+          },
+          "outputData": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TSLProperty"
+            }
+          }
+        }
+      },
+      "TSLEvent": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "code": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "subType": {
+            "type": "string",
+            "enum": ["INFO", "WARN", "ERROR"]
+          },
+          "outputData": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TSLProperty"
+            }
+          }
+        }
+      },
+      "DeviceListResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer"
+          },
+          "msg": {
+            "type": "string"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Device"
+            }
+          },
+          "pageNum": {
+            "type": "integer"
+          },
+          "pageSize": {
+            "type": "integer"
+          },
+          "pages": {
+            "type": "integer"
+          },
+          "total": {
+            "type": "integer"
+          }
+        }
+      },
+      "Device": {
+        "type": "object",
+        "properties": {
+          "deviceKey": {
+            "type": "string",
+            "description": "Device key"
+          },
+          "deviceName": {
+            "type": "string",
+            "description": "Device name"
+          },
+          "productKey": {
+            "type": "string",
+            "description": "Product key"
+          },
+          "deviceStatus": {
+            "type": "integer",
+            "description": "Device status: 1-Online, 0-Offline"
+          },
+          "isActived": {
+            "type": "integer",
+            "description": "Activation status: 1-Activated, 0-Not activated"
+          },
+          "isVerified": {
+            "type": "integer",
+            "description": "Verification status: 1-Verified, 0-Not verified"
+          },
+          "authMode": {
+            "type": "integer",
+            "description": "Authentication mode"
+          },
+          "dataFmt": {
+            "type": "integer",
+            "description": "Data format"
+          },
+          "createTime": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Creation timestamp"
+          },
+          "activedTime": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Activation timestamp"
+          },
+          "lastConnTime": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Last connection timestamp"
+          },
+          "lastOfflineTime": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Last offline timestamp"
+          }
+        }
+      },
+      "DeviceEvent": {
+        "type": "object",
+        "properties": {
+          "deviceKey": {
+            "type": "string"
+          },
+          "productKey": {
+            "type": "string"
+          },
+          "eventType": {
+            "type": "string"
+          },
+          "eventData": {
+            "type": "object"
+          },
+          "timestamp": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "description": "Error code"
+          },
+          "msg": {
+            "type": "string",
+            "description": "Error message"
+          },
+          "error": {
+            "type": "string",
+            "description": "Error description"
           }
         }
       }
