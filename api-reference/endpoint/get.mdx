@@ -7,18 +7,19 @@ This endpoint retrieves the Thing Specification Language (TSL) model for a produ
 
 ## Authentication Required
 
-This endpoint requires a valid JWT token obtained through the authentication API. Include the token in the Authorization header:
+This endpoint requires a valid QJWT access token obtained through the authentication API. 
 
-```
-Authorization: YOUR_FULL_ACCESS_TOKEN
-```
+**How to use in API Playground**:
+1. Copy your complete access token from the authentication response
+2. Paste it directly into the "Authorization" field in the API playground
+3. The token should start with "QJWT" and include the full JWT string
 
-**⚠️ Important**: Use the complete `access_token` value from the authentication response, including the "QJWT" prefix if present. Do NOT add "Bearer" prefix - the token already contains the necessary authentication type.
+**Token Format**: `QJWT xxxx`
 
-**Example**:
-- If your token is: `QJWT eyJhbGciOiJIUzI1NiJ9...`
-- Use: `Authorization: QJWT eyJhbGciOiJIUzI1NiJ9...`
-- Do NOT use: `Authorization: Bearer QJWT eyJhbGciOiJIUzI1NiJ9...`
+**⚠️ Important**: 
+- Use the complete token including the "QJWT" prefix
+- Do NOT add "Bearer" or any other prefix
+- Simply copy and paste the entire access_token value
 
 ## Example Usage
 

@@ -17,7 +17,7 @@
   ],
   "security": [
     {
-      "bearerAuth": []
+      "QJWTAuth": []
     }
   ],
   "paths": {
@@ -599,9 +599,11 @@
       }
     },
     "securitySchemes": {
-      "bearerAuth": {
-        "type": "http",
-        "scheme": "bearer"
+      "QJWTAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "Enter your complete QJWT access token (including QJWT prefix). Example: QJWT xxxx"
       }
     }
   }
