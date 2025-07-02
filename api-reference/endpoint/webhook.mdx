@@ -121,6 +121,196 @@ curl -X GET "https://iot-api.acceleronix.io/v2/quecauth/accessKeyAuthrize/access
 - Keep your AccessSecret secure and never share it
 - The timestamp should be current time in milliseconds
 
+## 🛠️ Authentication Parameter Generator
+
+Use this tool to automatically generate the required `username` and `password` parameters:
+
+<div style={{
+  border: '1px solid #e1e5e9',
+  borderRadius: '8px',
+  padding: '20px',
+  marginBottom: '20px',
+  backgroundColor: '#f8f9fa'
+}}>
+
+<div style={{ marginBottom: '15px' }}>
+  <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>AccessKey:</label>
+  <input 
+    type="text" 
+    id="accessKey" 
+    placeholder="Enter your AccessKey"
+    style={{
+      width: '100%',
+      padding: '8px 12px',
+      border: '1px solid #ccc',
+      borderRadius: '4px',
+      fontSize: '14px'
+    }}
+  />
+</div>
+
+<div style={{ marginBottom: '15px' }}>
+  <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>AccessSecret:</label>
+  <input 
+    type="password" 
+    id="accessSecret" 
+    placeholder="Enter your AccessSecret"
+    style={{
+      width: '100%',
+      padding: '8px 12px',
+      border: '1px solid #ccc',
+      borderRadius: '4px',
+      fontSize: '14px'
+    }}
+  />
+</div>
+
+<button 
+  onclick="generateAuthParams()"
+  style={{
+    backgroundColor: '#16A34A',
+    color: 'white',
+    padding: '10px 20px',
+    border: 'none',
+    borderRadius: '4px',
+    cursor: 'pointer',
+    fontWeight: 'bold',
+    marginBottom: '15px'
+  }}
+>
+  Generate Parameters
+</button>
+
+<div id="authResult" style={{ display: 'none' }}>
+  <h4>Generated Parameters:</h4>
+  
+  <div style={{ marginBottom: '10px' }}>
+    <label style={{ fontWeight: 'bold' }}>Username (URL encoded):</label>
+    <div style={{
+      backgroundColor: '#fff',
+      padding: '8px',
+      border: '1px solid #ddd',
+      borderRadius: '4px',
+      fontFamily: 'monospace',
+      fontSize: '12px',
+      wordBreak: 'break-all',
+      margin: '5px 0'
+    }}>
+      <span id="usernameResult"></span>
+    </div>
+    <button onclick="copyToClipboard('usernameResult')" style={{
+      fontSize: '12px',
+      padding: '4px 8px',
+      backgroundColor: '#f0f0f0',
+      border: '1px solid #ccc',
+      borderRadius: '3px',
+      cursor: 'pointer'
+    }}>Copy</button>
+  </div>
+
+  <div style={{ marginBottom: '10px' }}>
+    <label style={{ fontWeight: 'bold' }}>Password (SHA256):</label>
+    <div style={{
+      backgroundColor: '#fff',
+      padding: '8px',
+      border: '1px solid #ddd',
+      borderRadius: '4px',
+      fontFamily: 'monospace',
+      fontSize: '12px',
+      wordBreak: 'break-all',
+      margin: '5px 0'
+    }}>
+      <span id="passwordResult"></span>
+    </div>
+    <button onclick="copyToClipboard('passwordResult')" style={{
+      fontSize: '12px',
+      padding: '4px 8px',
+      backgroundColor: '#f0f0f0',
+      border: '1px solid #ccc',
+      borderRadius: '3px',
+      cursor: 'pointer'
+    }}>Copy</button>
+  </div>
+
+  <div style={{
+    backgroundColor: '#e7f3ff',
+    padding: '10px',
+    borderRadius: '4px',
+    border: '1px solid #b3d9ff',
+    fontSize: '14px'
+  }}>
+    <strong>How to use:</strong>
+    <ol style={{ margin: '8px 0', paddingLeft: '20px' }}>
+      <li>Copy the Username value above</li>
+      <li>Paste it into the "username" parameter in the API playground below</li>
+      <li>Copy the Password value above</li>
+      <li>Paste it into the "password" parameter in the API playground below</li>
+      <li>Set "grant_type" to "password"</li>
+      <li>Click "Send Request" to get your access token</li>
+    </ol>
+  </div>
+</div>
+
+</div>
+
+<script>{`
+  async function sha256(message) {
+    const msgUint8 = new TextEncoder().encode(message);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    return hashHex;
+  }
+
+  async function generateAuthParams() {
+    const accessKey = document.getElementById('accessKey').value.trim();
+    const accessSecret = document.getElementById('accessSecret').value.trim();
+    
+    if (!accessKey || !accessSecret) {
+      alert('Please enter both AccessKey and AccessSecret');
+      return;
+    }
+    
+    // Generate timestamp (current time in milliseconds)
+    const timestamp = Date.now().toString();
+    
+    // Create username string
+    const usernameRaw = \`ver=1&auth_mode=accessKey&sign_method=sha256&access_key=\${accessKey}&timestamp=\${timestamp}\`;
+    
+    // URL encode username
+    const usernameEncoded = encodeURIComponent(usernameRaw);
+    
+    // Generate SHA256 password
+    const passwordInput = usernameRaw + accessSecret;
+    const passwordHash = await sha256(passwordInput);
+    
+    // Display results
+    document.getElementById('usernameResult').textContent = usernameEncoded;
+    document.getElementById('passwordResult').textContent = passwordHash;
+    document.getElementById('authResult').style.display = 'block';
+  }
+
+  function copyToClipboard(elementId) {
+    const text = document.getElementById(elementId).textContent;
+    navigator.clipboard.writeText(text).then(function() {
+      // Visual feedback
+      const button = event.target;
+      const originalText = button.textContent;
+      button.textContent = 'Copied!';
+      button.style.backgroundColor = '#16A34A';
+      button.style.color = 'white';
+      setTimeout(() => {
+        button.textContent = originalText;
+        button.style.backgroundColor = '#f0f0f0';
+        button.style.color = 'black';
+      }, 1000);
+    }).catch(function(err) {
+      console.error('Could not copy text: ', err);
+      alert('Copy failed. Please select and copy manually.');
+    });
+  }
+`}</script>
+
 ## Response
 
 Successful response includes:

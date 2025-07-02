@@ -54,13 +54,15 @@ ver=1&auth_mode=accessKey&sign_method=sha256&access_key=${AccessKey}&timestamp=$
 SHA256("${username}${AccessSecret}")
 ```
 
-### Step 2: Use Bearer Token
+### Step 2: Use QJWT Access Token
 
-Include the JWT token in the Authorization header for all API requests:
+Include the complete QJWT access token in the Authorization header for all API requests:
 
 ```bash
-Authorization: Bearer YOUR_JWT_TOKEN
+Authorization: YOUR_COMPLETE_QJWT_TOKEN
 ```
+
+**Important**: Use the complete token including the "QJWT" prefix. Do NOT add "Bearer" prefix.
 
 ### Step 3: Token Management
 

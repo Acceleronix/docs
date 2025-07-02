@@ -111,12 +111,12 @@
           {
             "name": "language",
             "in": "query",
-            "description": "Language: CN/EN (default: CN)",
+            "description": "Language: CN/EN (default: EN)",
             "required": false,
             "schema": {
               "type": "string",
               "enum": ["CN", "EN"],
-              "default": "CN"
+              "default": "EN"
             }
           }
         ],
